@@ -1,5 +1,5 @@
 import pandas as pd
-from StockTrades import StockTrades
+from .StockTrades import StockTrades
 
 
 def moving_average(prices: pd.Series, mov_avg: int):
@@ -19,17 +19,15 @@ class MovingAverageCross(StockTrades):
             mov_avg_slow: int,
             start_money: int = 1000
     ):
-        super.__init__(
+        self.mov_avg_fast = mov_avg_fast
+        self.mov_avg_slow = mov_avg_slow
+
+        super().__init__(
             ticker=ticker,
             start_date=start_date,
             end_date=end_date,
             start_money=start_money
         )
-
-        self.mov_avg_fast = mov_avg_fast
-        self.mov_avg_slow = mov_avg_slow
-
-        self.calculte_trades()
 
     def calculate_trades(self):
         super().calculate_trades()

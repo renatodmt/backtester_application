@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-
+import plotly.graph_objects as go
 
 class StockTrades:
     def __init__(
@@ -19,7 +19,11 @@ class StockTrades:
         self.trades = None
         self.profit_and_loss = None
         self.indicators = None
+        self.price_graph = None
         self.get_prices()
+        self.calculate_trades()
+        self.calculate_profit_and_loss()
+        self.create_price_graph()
 
     def get_prices(self):
         """This method populates the prices attribute with a series with data as index and adjusted price as data,
@@ -56,3 +60,38 @@ class StockTrades:
         """This method is not implemented yet. It will create a table with summary information of the trade, such as
         sharpe, drawdown and etc."""
         pass
+
+    def create_price_graph(self):
+        """This method create the price with the dots showing longs and short positions"""
+        self.price_graph = go.Figure()
+        line_dict = [
+            {
+                'trade': [-1, 0, 1],
+                'color': 'gray',
+                'name': 'No Trade'
+            },
+            {
+                'trade': [1],
+                'color': 'green',
+                'name': 'Buy'
+            },
+            {
+                'trade': [-1],
+                'color': 'red',
+                'name': 'Short'
+            }
+        ]
+        for line in line_dict:
+            self.price_graph.add_trace(
+                go.Scatter(
+                    y=self.prices.where(
+                        self.trades.isin(line['trade']),
+                        None
+                    ),
+                    x=self.prices.index,
+                    mode='lines',
+                    line_color=line['color'],
+                    name=line['name']
+                )
+            )
+

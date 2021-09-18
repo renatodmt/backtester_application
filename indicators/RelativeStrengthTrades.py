@@ -2,7 +2,6 @@ import pandas as pd
 from .StockTrades import StockTrades
 
 
-
 class RelativeStrengthIndex(StockTrades):
     def __init__(
             self,
@@ -26,6 +25,7 @@ class RelativeStrengthIndex(StockTrades):
         )
 
     def calculate_trades(self):
-        super().calculate_trades()
+        pass
+
 
 

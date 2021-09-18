@@ -2,10 +2,8 @@
 # visit http://127.0.0.1:8050/ in your web browser.
 
 import dash
-import dash_core_components as dcc
-import dash_html_components as html
-import plotly.express as px
-import pandas as pd
+from dash import dcc, html
+import dash_table
 from indicators.MovingAverageCross import MovingAverageCross
 
 app = dash.Dash(__name__)
@@ -26,8 +24,25 @@ app.layout = html.Div(children=[
     '''),
 
     dcc.Graph(
-        id='example-graph',
+        id='price-graph',
         figure=stock_trades.price_graph
+    ),
+
+    dcc.Graph(
+        id='profit-and-loss-graph',
+        figure=stock_trades.profit_and_loss_graph
+    ),
+
+    dcc.Graph(
+        id='indicators-graph',
+        figure=stock_trades.indicators_graph
+    ),
+
+    html.Div(
+        children=dash_table.DataTable(
+            id='tbl', data=stock_trades.summary_trades_table.to_dict('records'),
+            columns=[{"name": i, "id": i} for i in stock_trades.summary_trades_table.columns],
+        )
     )
 ])
 

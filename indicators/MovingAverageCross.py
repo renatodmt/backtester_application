@@ -30,14 +30,13 @@ class MovingAverageCross(StockTrades):
         )
 
     def calculate_trades(self):
-        super().calculate_trades()
 
         self.indicators = {
-            'mov_avg_fast': moving_average(
+            'Mov. Avg. Fast': moving_average(
                 prices=self.prices,
                 mov_avg=self.mov_avg_fast
             ),
-            'mov_avg_slow': moving_average(
+            'Mov. Avg. Slow': moving_average(
                 prices=self.prices,
                 mov_avg=self.mov_avg_slow
             )
@@ -50,18 +49,17 @@ class MovingAverageCross(StockTrades):
             index=self.prices.index
         )
         self.trades.where(
-            cond=self.indicators['mov_avg_fast'] > self.indicators['mov_avg_slow'],
+            cond=self.indicators['Mov. Avg. Fast'] > self.indicators['Mov. Avg. Slow'],
             other=-1,
             inplace=True
         )
         self.trades.where(
-            cond=self.indicators['mov_avg_fast'] < self.indicators['mov_avg_slow'],
+            cond=self.indicators['Mov. Avg. Fast'] < self.indicators['Mov. Avg. Slow'],
             other=1,
             inplace=True
         )
         self.trades.where(
-            cond=~(self.indicators['mov_avg_fast'].isna() | self.indicators['mov_avg_slow'].isna()),
+            cond=~(self.indicators['Mov. Avg. Fast'].isna() | self.indicators['Mov. Avg. Slow'].isna()),
             other=0,
             inplace=True
         )
-

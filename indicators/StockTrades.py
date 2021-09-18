@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
+import plotly.express as px
+
 
 class StockTrades:
     def __init__(
@@ -20,17 +22,24 @@ class StockTrades:
         self.profit_and_loss = None
         self.indicators = None
         self.price_graph = None
+        self.profit_and_loss_graph = None
+        self.indicators_graph = None
+        self.summary_trades_table = None
+
         self.get_prices()
         self.calculate_trades()
         self.calculate_profit_and_loss()
         self.create_price_graph()
+        self.create_profit_loss_graph()
+        self.create_indicators_graph()
+        self.create_table_of_trades()
 
     def get_prices(self):
         """This method populates the prices attribute with a series with data as index and adjusted price as data,
         currently the method is not implemented, just returning random prices"""
         self.prices = pd.Series(
             data=np.random.choice(
-                a=range(1000,1100),
+                a=range(1000, 1100),
                 size=len(pd.date_range(
                     start=self.start_date,
                     end=self.end_date
@@ -42,16 +51,8 @@ class StockTrades:
             )
         )
 
-    def calculate_trades(self):
-        """This method calculate the trading series (1 for buy, -1 for sell and 0 for no trades), it should be
-        implemented in the child objects, but we put the general error checking in here and call via super"""
-        if not hasattr(self, 'prices'):
-            raise Exception("You have to call get_prices method before calculating trades")
-
     def calculate_profit_and_loss(self):
         """This method calculates the accumulated returns of each period and multiply by the start money."""
-        if not hasattr(self, 'trades'):
-            raise Exception("You have to call calculate_trades method before calculating profit_and_loss")
 
         stock_returns = (self.prices.shift(1) / self.prices - 1) * self.trades + 1
         self.profit_and_loss = stock_returns.cumprod() * self.start_money
@@ -95,3 +96,46 @@ class StockTrades:
                 )
             )
 
+    def create_profit_loss_graph(self):
+        """This method create a graph showing the profit and loss of the model."""
+        self.profit_and_loss_graph = px.line(
+            y=self.profit_and_loss,
+            x=self.profit_and_loss.index
+        )
+
+    def create_indicators_graph(self):
+        """This method create the graph showing indicators value"""
+        self.indicators_graph = go.Figure()
+        for indicator in self.indicators:
+            self.indicators_graph.add_trace(
+                go.Scatter(
+                    y=self.indicators[indicator],
+                    x=self.indicators[indicator].index,
+                    mode='lines',
+                    line_color='gray',
+                    name=indicator
+                )
+            )
+
+    def create_table_of_trades(self):
+        """This method creates a table summarizing when the model started a trade and when it ended and it profit."""
+        self.summary_trades_table = pd.DataFrame()
+        for trade_position in [-1, 1]:
+            if trade_position == -1:
+                trade_type = 'short'
+            else:
+                trade_type = 'buy'
+
+            trades = pd.DataFrame()
+            trades['start_date'] = self.trades[
+                (self.trades.shift(-1) != trade_position) & (self.trades == trade_position)].index
+            trades['end_date'] = self.trades[
+                (self.trades.shift(-1) == trade_position) & (self.trades != trade_position)].index
+            trades['position'] = trade_type
+            trades['start_price'] = self.prices[self.prices.index.isin(trades['start_date'])].values
+            trades['end_price'] = self.prices[self.prices.index.isin(trades['end_date'])].values
+            trades['trade_return'] = (trades['end_price'] - trades['start_price']) \
+                / trades['start_price'] * trade_position
+            self.summary_trades_table = pd.concat([self.summary_trades_table, trades])
+
+        self.summary_trades_table.sort_values('start_date', inplace=True)

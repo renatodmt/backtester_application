@@ -3,7 +3,7 @@ from .StockTrades import StockTrades
 
 
 
-class MovingAverageCross(StockTrades):
+class RelativeStrengthIndex(StockTrades):
     def __init__(
             self,
             ticker: str,

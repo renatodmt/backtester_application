@@ -51,6 +51,9 @@ class StockTrades:
             )
         )
 
+    def calculate_trades(self):
+        self.trades.iat[-1] = 0 #This is a hack to force the last trade to close
+
     def calculate_profit_and_loss(self):
         """This method calculates the accumulated returns of each period and multiply by the start money."""
 
@@ -128,9 +131,9 @@ class StockTrades:
 
             trades = pd.DataFrame()
             trades['start_date'] = self.trades[
-                (self.trades.shift(-1) != trade_position) & (self.trades == trade_position)].index
+                (self.trades.shift(1) != trade_position) & (self.trades == trade_position)].index
             trades['end_date'] = self.trades[
-                (self.trades.shift(-1) == trade_position) & (self.trades != trade_position)].index
+                (self.trades.shift(1) == trade_position) & (self.trades != trade_position)].index
             trades['position'] = trade_type
             trades['start_price'] = self.prices[self.prices.index.isin(trades['start_date'])].values
             trades['end_price'] = self.prices[self.prices.index.isin(trades['end_date'])].values

@@ -1,12 +1,6 @@
 import pandas as pd
 from .StockTrades import StockTrades
-
-
-def moving_average(prices: pd.Series, mov_avg: int):
-    if mov_avg < 0:
-        raise Exception("Moving Average should be a positive number.")
-
-    return prices.rolling(mov_avg).mean()
+from .support_functions import moving_average
 
 
 class MovingAverageCross(StockTrades):
@@ -63,3 +57,5 @@ class MovingAverageCross(StockTrades):
             other=0,
             inplace=True
         )
+
+        super().calculate_trades()

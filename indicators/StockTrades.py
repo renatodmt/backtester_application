@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 import plotly.express as px
+from typing import Dict, Callable
 
 
 class StockTrades:
@@ -10,12 +11,16 @@ class StockTrades:
         ticker: str,
         start_date: str,
         end_date: str,
+        model_parameters: Dict,
+        calculate_trades: Callable,
         start_money: int = 1000
     ):
         self.ticker = ticker
         self.start_date = start_date
         self.end_date = end_date
         self.start_money = start_money
+        self.model_parameters = model_parameters
+        self.calculate_trades = calculate_trades
 
         self.prices = None
         self.trades = None
@@ -27,7 +32,7 @@ class StockTrades:
         self.summary_trades_table = None
 
         self.get_prices()
-        self.calculate_trades()
+        self.calculate_trades(self)
         self.calculate_profit_and_loss()
         self.create_price_graph()
         self.create_profit_loss_graph()
@@ -51,9 +56,6 @@ class StockTrades:
             )
         )
 
-    def calculate_trades(self):
-        self.trades.iat[-1] = 0 #This is a hack to force the last trade to close
-
     def calculate_profit_and_loss(self):
         """This method calculates the accumulated returns of each period and multiply by the start money."""
 
@@ -72,17 +74,17 @@ class StockTrades:
             {
                 'trade': [-1, 0, 1],
                 'color': 'gray',
-                'name': 'No Trade'
+                'name': 'Sem Posição'
             },
             {
                 'trade': [1],
                 'color': 'green',
-                'name': 'Buy'
+                'name': 'Comprado'
             },
             {
                 'trade': [-1],
                 'color': 'red',
-                'name': 'Short'
+                'name': 'Vendido'
             }
         ]
         for line in line_dict:
@@ -125,20 +127,27 @@ class StockTrades:
         self.summary_trades_table = pd.DataFrame()
         for trade_position in [-1, 1]:
             if trade_position == -1:
-                trade_type = 'short'
+                trade_type = 'Vendido'
             else:
-                trade_type = 'buy'
+                trade_type = 'Comprado'
 
             trades = pd.DataFrame()
-            trades['start_date'] = self.trades[
+            trades['Data Início'] = self.trades[
                 (self.trades.shift(1) != trade_position) & (self.trades == trade_position)].index
-            trades['end_date'] = self.trades[
+            trades['Data Fim'] = self.trades[
                 (self.trades.shift(1) == trade_position) & (self.trades != trade_position)].index
-            trades['position'] = trade_type
-            trades['start_price'] = self.prices[self.prices.index.isin(trades['start_date'])].values
-            trades['end_price'] = self.prices[self.prices.index.isin(trades['end_date'])].values
-            trades['trade_return'] = (trades['end_price'] - trades['start_price']) \
-                / trades['start_price'] * trade_position
+            trades['Posição'] = trade_type
+            trades['Preço Entrada'] = self.prices[self.prices.index.isin(trades['Data Início'])].values
+            trades['Preço Saída'] = self.prices[self.prices.index.isin(trades['Data Fim'])].values
+            trades['Retorno (%)'] = (trades['Preço Saída'] - trades['Preço Entrada']) \
+                / trades['Preço Entrada'] * trade_position * 100
             self.summary_trades_table = pd.concat([self.summary_trades_table, trades])
 
-        self.summary_trades_table.sort_values('start_date', inplace=True)
+        self.summary_trades_table.sort_values('Data Início', inplace=True)
+        self.summary_trades_table['Data Início'] = self.summary_trades_table['Data Início'].dt.strftime('%d/%b/%y')
+        self.summary_trades_table['Data Fim'] = self.summary_trades_table['Data Fim'].dt.strftime('%d/%b/%y')
+        self.summary_trades_table['Retorno (%)'] = self.summary_trades_table['Retorno (%)'].round(2).astype(str) + '%'
+        self.summary_trades_table['Preço Entrada'] = self.summary_trades_table['Preço Entrada'].round(2)
+        self.summary_trades_table['Preço Saída'] = self.summary_trades_table['Preço Saída'].round(2)
+
+

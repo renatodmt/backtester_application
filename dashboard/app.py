@@ -1,18 +1,22 @@
 # Run this app with `python app.py` and
 # visit http://127.0.0.1:8050/ in your web browser.
 
+import locale
 import dash
 from dash import dcc, html
 import dash_table
 from dash.dependencies import Input, Output, State
-from indicators.MovingAverageCross import MovingAverageCross
-from indicators.BollingerBands import BollingerBands
+from indicators.StockTrades import StockTrades
+from indicators.model_strategies import calculate_trades_bollinger_bands, calculate_trades_moving_average_cross, \
+    calculate_trades_rsi
+
+locale.setlocale(locale.LC_ALL, 'pt_BR')
 
 app = dash.Dash(__name__)
 
 available_indicators = [
-    'Moving Average Cross',
-    'Relative Strength Index',
+    'Cruzamento Média Móvel',
+    #'Relative Strength Index',
     'Bollinger Bands'
 ]
 
@@ -58,7 +62,7 @@ app.layout = html.Div(children=[
                 value=60,
             )
         ],
-        style={'display': 'block'}
+        style={'display': 'flex', 'flex-direction': 'column'}
     ),
 
     html.Div(
@@ -103,7 +107,7 @@ app.layout = html.Div(children=[
                 value=20,
             )
         ],
-        style={'display': 'none'}
+        style={'display': 'none', 'flex-direction': 'column'}
     ),
 
     html.Button('Atualizar', id='update-button', n_clicks=0),
@@ -129,12 +133,12 @@ app.layout = html.Div(children=[
     Input('trading-indicators', 'value')
 )
 def change_visibility_models_parameters(trading_strategy):
-    if trading_strategy == 'Moving Average Cross':
-        mov_avg = {'display': 'block'}
+    if trading_strategy == 'Cruzamento Média Móvel':
+        mov_avg = {'display': 'flex'}
         bollinger = {'display': 'none'}
     elif trading_strategy == 'Bollinger Bands':
         mov_avg = {'display': 'none'}
-        bollinger = {'display': 'block'}
+        bollinger = {'display': 'flex'}
 
     return mov_avg, bollinger
 
@@ -162,31 +166,27 @@ def update(
     bollinger_std,
     bollinger_std_period
 ):
-    if trading_strategy == 'Moving Average Cross':
-        model = MovingAverageCross(
-            ticker='PETR4',
-            start_date='2021-01-01',
-            end_date='2021-09-01',
-            mov_avg_fast=mov_avg_fast,
-            mov_avg_slow=mov_avg_slow
-        )
-    elif trading_strategy == 'Relative Strength Index':
-        model = MovingAverageCross(
-            ticker='PETR4',
-            start_date='2021-01-01',
-            end_date='2021-09-01',
-            mov_avg_fast=10,
-            mov_avg_slow=100
-        )
-    elif trading_strategy == 'Bollinger Bands':
-        model = BollingerBands(
-            ticker='PETR4',
-            start_date='2021-01-01',
-            end_date='2021-09-01',
-            bands_mov_avg_period=bollinger_mov_avg,
-            bands_std=bollinger_std,
-            band_std_period=bollinger_std_period,
-        )
+    strategies_mapper = {
+        'Cruzamento Média Móvel': calculate_trades_moving_average_cross,
+        'Bollinger Bands': calculate_trades_bollinger_bands,
+        'Relative Strength Index': calculate_trades_rsi
+    }
+
+    model_parameters = {
+        'mov_avg_fast': mov_avg_fast,
+        'mov_avg_slow': mov_avg_slow,
+        'bollinger_mov_avg': bollinger_mov_avg,
+        'bollinger_std': bollinger_std,
+        'bollinger_std_period': bollinger_std_period
+    }
+
+    model = StockTrades(
+        ticker='PETR4',
+        start_date='2021-01-01',
+        end_date='2021-09-01',
+        model_parameters=model_parameters,
+        calculate_trades=strategies_mapper[trading_strategy]
+    )
 
     return \
         model.price_graph, \

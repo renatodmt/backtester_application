@@ -10,7 +10,7 @@ class BollingerBands(StockTrades):
             start_date: str,
             end_date: str,
             bands_mov_avg_period: int,
-            bands_std: int,
+            bands_std: float,
             band_std_period: int,
             start_money: int = 1000
     ):

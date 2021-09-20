@@ -1,5 +1,6 @@
 """This script deal with logic behind updating the dashboard via URL parameter"""
 import datetime
+from dash import html, dcc, dash_table
 from dash.exceptions import PreventUpdate
 from strategies_mappers import strategies_parameters, strategies_mapper
 from indicators.StockTrades import StockTrades
@@ -54,13 +55,7 @@ def update_dash_using_url(pathname):
     try:
         object_creation_dict = sanitize_creation_dict(object_creation_dict)
     except ValueError:
-        return \
-            [], \
-            [], \
-            [], \
-            [], \
-            [], \
-            pathname
+        raise PreventUpdate
 
     model = StockTrades(
         ticker=object_creation_dict['ticker'],
@@ -70,10 +65,15 @@ def update_dash_using_url(pathname):
         calculate_trades=strategies_mapper[object_creation_dict['strategy']]
     )
 
-    return \
-        model.price_graph, \
-        model.profit_and_loss_graph, \
-        model.indicators_graph, \
-        model.summary_trades_table.to_dict('records'), \
-        [{"name": i, "id": i} for i in model.summary_trades_table.columns], \
-        pathname
+    return [
+        dcc.Graph(id='price-graph', figure=model.price_graph),
+        dcc.Graph(id='profit-and-loss-graph', figure=model.profit_and_loss_graph),
+        dcc.Graph(id='indicators-graph', figure=model.indicators_graph),
+        html.Div(
+            children=dash_table.DataTable(
+                id='trade-summary',
+                data=model.summary_trades_table.to_dict('records'),
+                columns=[{"name": i, "id": i} for i in model.summary_trades_table.columns]
+            )
+        )
+    ]

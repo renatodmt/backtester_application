@@ -106,5 +106,10 @@ control_component = html.Div(children=[
         style={'display': 'none', 'flex-direction': 'column'}
     ),
 
-    dbc.Button('Atualizar', color="primary", id='update-button', n_clicks=0)
+    dbc.Button(
+        children="Atualizar",
+        color="primary",
+        id='update-button',
+        n_clicks=0
+    )
 ])

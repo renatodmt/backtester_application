@@ -3,8 +3,8 @@
 
 import locale
 from dash import html, dcc
+import dash_bootstrap_components as dbc
 from control_component import control_component
-from figures_component import figures_component
 from routing_callbacks import update_dash, change_button_status
 from main import app
 
@@ -12,7 +12,7 @@ app.layout = html.Div(children=[
     dcc.Location(id='url', refresh=False),
     html.H1(id='title', children='Backtester de Estratégias'),
     control_component,
-    figures_component
+    dbc.Spinner(children=html.Div(id='graphs'), id='spinner')
 ])
 
 if __name__ == '__main__':

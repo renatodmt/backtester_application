@@ -31,79 +31,80 @@ control_component = html.Div(children=[
 
     html.Div(
         id='mov-avg-cross-parameters',
+        className='model-parameters',
         children=[
-            html.Label(
-                children='Média Móvel Curta'
+            html.Div(
+                className='parameters-col',
+                children=[
+                    html.Label(children='Média Móvel Curta'),
+                    html.Label(children='Média Móvel Longa')
+                ]
             ),
-
-            dcc.Input(
-                id='mov-avg-fast',
-                type="number",
-                min=1,
-                max=365,
-                step=1,
-                value=10,
-            ),
-
-            html.Label(
-                children='Média Móvel Longa'
-            ),
-
-            dcc.Input(
-                id='mov-avg-slow',
-                type="number",
-                min=1,
-                max=365,
-                step=1,
-                value=60,
+            html.Div(
+                className='parameters-col',
+                children=[
+                    dcc.Input(
+                        id='mov-avg-fast',
+                        type="number",
+                        min=1,
+                        max=365,
+                        step=1,
+                        value=10,
+                    ),
+                    dcc.Input(
+                        id='mov-avg-slow',
+                        type="number",
+                        min=1,
+                        max=365,
+                        step=1,
+                        value=60,
+                    )
+                ]
             )
-        ],
-        style={'display': 'flex', 'flex-direction': 'column'}
+        ]
     ),
 
     html.Div(
         id='bollinger-bands-parameters',
         children=[
-            html.Label(
-                children='Média Móvel Centro'
+            html.Div(
+                className='parameters-col',
+                children=[
+                    html.Label(children='Média Móvel'),
+                    html.Label(children='Desvio Padrão'),
+                    html.Label(children='Período Desvio Padrão')
+                ]
             ),
-
-            dcc.Input(
-                id='bollinger-mov-avg',
-                type="number",
-                min=1,
-                max=365,
-                step=1,
-                value=14,
-            ),
-
-            html.Label(
-                children='Desvio Padrão'
-            ),
-
-            dcc.Input(
-                id='bollinger-std',
-                type="number",
-                min=0.1,
-                max=4,
-                step=0.1,
-                value=2,
-            ),
-
-            html.Label(
-                children='Período Desvio Padrão'
-            ),
-
-            dcc.Input(
-                id='bollinger-std-period',
-                type="number",
-                min=2,
-                max=365,
-                step=1,
-                value=20,
+            html.Div(
+                className='parameters-col',
+                children=[
+                    dcc.Input(
+                        id='bollinger-mov-avg',
+                        type="number",
+                        min=1,
+                        max=365,
+                        step=1,
+                        value=14,
+                    ),
+                    dcc.Input(
+                        id='bollinger-std',
+                        type="number",
+                        min=0.1,
+                        max=4,
+                        step=0.1,
+                        value=2,
+                    ),
+                    dcc.Input(
+                        id='bollinger-std-period',
+                        type="number",
+                        min=2,
+                        max=365,
+                        step=1,
+                        value=20,
+                    )
+                ]
             )
-        ],
-        style={'display': 'none', 'flex-direction': 'column'}
+        ]
     ),
 
     dbc.Button(

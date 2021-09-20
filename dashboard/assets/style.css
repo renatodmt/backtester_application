@@ -1,0 +1,28 @@
+input {
+    text-align: center;
+}
+
+.parameters-col{
+    display: flex;
+    flex-direction: column;
+    margin: 5px;
+    justify-content: space-around;
+}
+
+button, #trading-indicators {
+    width: 80vw;
+    max-width: 400px;
+}
+
+button, input, label, #trading-indicators, #graph {
+    margin: 5px;
+}
+
+#price-graph {
+    height: 120VH;
+}
+
+#trade-summary {
+    width: 90VW;
+    margin: 5VW;
+}

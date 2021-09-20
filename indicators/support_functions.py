@@ -6,3 +6,4 @@ def moving_average(prices: pd.Series, mov_avg: int):
         raise Exception("Moving Average should be a positive number.")
 
     return prices.rolling(mov_avg).mean()
+

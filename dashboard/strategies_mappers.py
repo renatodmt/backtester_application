@@ -6,7 +6,6 @@ from indicators.model_strategies import  \
     calculate_trades_moving_average_cross
 
 
-
 strategies_parameters = [
     {'strategy': 'mov_avg', 'parameter': 'mov_avg_fast', 'conversion': int},
     {'strategy': 'mov_avg', 'parameter': 'mov_avg_slow', 'conversion': int},

@@ -11,7 +11,9 @@ from main import app
 app.layout = html.Div(children=[
     dcc.Location(id='url', refresh=False),
     html.H1(id='title', children='Backtester de Estratégias'),
+    html.Hr(),
     control_component,
+    html.Hr(),
     dbc.Spinner(children=html.Div(id='graphs'), id='spinner')
 ])
 

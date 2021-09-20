@@ -1,6 +1,8 @@
 from dash import dcc, html
 from dash.dependencies import Input, Output
+import dash_bootstrap_components as dbc
 from main import app
+from strategies_mappers import available_indicators
 
 
 @app.callback(
@@ -19,11 +21,6 @@ def change_visibility_models_parameters(trading_strategy):
 
     return mov_avg, bollinger
 
-
-available_indicators = [
-    {'label': 'Cruzamento Média Móvel', 'value': 'mov_avg'},
-    {'label': 'Bollinger Bands', 'value': 'bb'}
-]
 
 control_component = html.Div(children=[
     dcc.Dropdown(
@@ -109,5 +106,5 @@ control_component = html.Div(children=[
         style={'display': 'none', 'flex-direction': 'column'}
     ),
 
-    html.Button('Atualizar', id='update-button', n_clicks=0)
+    dbc.Button('Atualizar', color="primary", id='update-button', n_clicks=0)
 ])

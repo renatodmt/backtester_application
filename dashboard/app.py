@@ -3,11 +3,10 @@
 
 import locale
 from dash import html, dcc
-from dash.dependencies import Input, Output
 from control_component import control_component
 from figures_component import figures_component
+from routing_callbacks import update_dash, change_button_status
 from main import app
-
 
 app.layout = html.Div(children=[
     dcc.Location(id='url', refresh=False),
@@ -15,7 +14,6 @@ app.layout = html.Div(children=[
     control_component,
     figures_component
 ])
-
 
 if __name__ == '__main__':
     locale.setlocale(locale.LC_ALL, 'pt_BR')

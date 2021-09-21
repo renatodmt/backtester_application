@@ -20,8 +20,8 @@ def update_dash_using_button(
     }
 
     # Placeholder for ticker, start_date and end_date. They will come from the UI after.
-    ticker = 'petr4'
-    start_date = '2020-01-01'
+    ticker = 'csna3.SA'
+    start_date = '2018-01-01'
     end_date = '2021-01-01'
 
     model = StockTrades(

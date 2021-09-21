@@ -2,6 +2,8 @@ import random
 import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
+import yfinance as yf
+import pandas_datareader as pdr
 from plotly.subplots import make_subplots
 from typing import Dict, Callable
 
@@ -48,20 +50,27 @@ class StockTrades:
 
     def get_prices(self):
         """This method populates the prices attribute with a series with data as index and adjusted price as data,
-        currently the method is not implemented, just returning random prices"""
-        self.prices = pd.Series(
-            data=np.random.choice(
-                a=range(1000, 1100),
-                size=len(pd.date_range(
-                    start=self.start_date,
-                    end=self.end_date
-                ))
-            ),
-            index=pd.date_range(
-                start=self.start_date,
-                end=self.end_date
-            )
-        )
+        currently the method is not implemented, just returning prices from 'Yahoo Finance'"""
+
+    #    self.prices = pd.Series(
+    #        data=np.random.choice(
+    #            a=range(1000, 1100),
+    #            size=len(pd.date_range(
+    #                start=self.start_date,
+    #                end=self.end_date
+    #            ))
+    #        ),
+    #        index=pd.date_range(
+    #            start=self.start_date,
+    #            end=self.end_date
+    #        )
+    #    )
+
+        self.prices = pdr.get_data_yahoo(
+            self.ticker,
+            self.start_date,
+            self.end_date,
+        )["Adj Close"]
 
     def calculate_profit_and_loss(self):
         """This method calculates the accumulated returns of each period and multiply by the start money."""

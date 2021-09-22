@@ -67,5 +67,20 @@ def calculate_trades_bollinger_bands(self):
     )
     self.trades.iat[-1] = 0 #This is a hack to force the last trade to close
 
-def calculate_trades_rsi(self):
-    pass
+def calculate_trades_rsi(self, rsi_period: int, overbought_line: float, oversold_line: float ):
+
+    self.rsi_period = rsi_period
+    self.overbought_line = overbought_line
+    self.oversold_line = oversold_line
+
+    self.prices['up'] = self.prices['Adj Close'].pct_change().clip(lower=0)
+    self.prices['down'] = self.prices['Adj Close'].pct_change().clip(upper=0)
+
+    stock.prices['rsi'] = 100 - 100 / (
+                1 + stock.prices['up'].ewm(self.rsi_period).mean() / (-1 * stock.prices['down'].ewm(self.rsi_period).mean()))
+
+    self.prices['stance'] = np.where(self.prices['rsi'] > overbought_line, -1, 0)
+    self.prices['stance'] = np.where(self.prices['rsi'] < oversold_line, 1, self.prices['stance'])
+    self.prices['stance'].value_counts()
+
+    self.prices['Strategy'] = self.prices['Adj Close'].pct_change() * self.prices['Stance'].shift()

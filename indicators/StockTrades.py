@@ -61,7 +61,7 @@ class StockTrades:
     def calculate_profit_and_loss(self):
         """This method calculates the accumulated returns of each period and multiply by the start money."""
 
-        stock_returns = (self.prices.shift(1) / self.prices - 1) * self.trades + 1
+        stock_returns = (self.prices / self.prices.shift(1) - 1) * self.trades + 1
         self.profit_and_loss = stock_returns.cumprod() * self.start_money
 
     def calculate_summary_of_trades(self):

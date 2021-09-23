@@ -4,6 +4,7 @@ from dash import html, dcc, dash_table
 from dash.exceptions import PreventUpdate
 from strategies_mappers import strategies_parameters, strategies_mapper
 from indicators.StockTrades import StockTrades
+from indicators.prices_strategies import get_prices_from_our_database
 
 
 def sanitize_creation_dict(object_creation_dict):
@@ -62,7 +63,9 @@ def update_dash_using_url(pathname):
         start_date=object_creation_dict['start_date'],
         end_date=object_creation_dict['end_date'],
         model_parameters=object_creation_dict,
-        calculate_trades=strategies_mapper[object_creation_dict['strategy']]
+        calculate_trades=strategies_mapper[object_creation_dict['strategy']],
+        get_prices=get_prices_from_our_database
+
     )
 
     return [

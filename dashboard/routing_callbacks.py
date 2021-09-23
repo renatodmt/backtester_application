@@ -56,7 +56,7 @@ def update_url(
         raise PreventUpdate
 
     # Placeholder for ticker, start_date and end_date. They will come from the UI after.
-    ticker = 'petr4'
+    ticker = 'PETR3'
     start_date = '2020-01-01'
     end_date = '2021-01-01'
 

@@ -1,6 +1,8 @@
+import datetime
 from dash import html, dcc, dash_table
 from strategies_mappers import strategies_mapper
 from indicators.StockTrades import StockTrades
+from indicators.prices_strategies import get_prices_from_our_database
 
 
 def update_dash_using_button(
@@ -20,16 +22,17 @@ def update_dash_using_button(
     }
 
     # Placeholder for ticker, start_date and end_date. They will come from the UI after.
-    ticker = 'csna3.SA'
-    start_date = '2018-01-01'
-    end_date = '2021-01-01'
+    ticker = 'PETR3'
+    start_date = datetime.datetime(2018, 1, 1)
+    end_date = datetime.datetime(2021, 1, 1)
 
     model = StockTrades(
         ticker=ticker,
         start_date=start_date,
         end_date=end_date,
         model_parameters=model_parameters,
-        calculate_trades=strategies_mapper[trading_strategy]
+        calculate_trades=strategies_mapper[trading_strategy],
+        get_prices=get_prices_from_our_database
     )
 
     return [

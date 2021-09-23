@@ -2,8 +2,6 @@ import random
 import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
-import yfinance as yf
-import pandas_datareader as pdr
 from plotly.subplots import make_subplots
 from typing import Dict, Callable
 
@@ -20,6 +18,7 @@ class StockTrades:
         end_date: str,
         model_parameters: Dict,
         calculate_trades: Callable,
+        get_prices: Callable,
         start_money: int = 1000
     ):
         self.ticker = ticker
@@ -28,6 +27,7 @@ class StockTrades:
         self.start_money = start_money
         self.model_parameters = model_parameters
         self.calculate_trades = calculate_trades
+        self.get_prices = get_prices
 
         self.prices = None
         self.trades = None
@@ -39,7 +39,7 @@ class StockTrades:
         self.summary_trades_table = None
         self.fig_subplots = None
 
-        self.get_prices()
+        self.get_prices(self)
         self.calculate_trades(self)
         self.calculate_profit_and_loss()
         self.create_price_graph()
@@ -47,16 +47,6 @@ class StockTrades:
         self.create_indicators_graph()
         self.create_table_of_trades()
         self.create_subplot_graph()
-
-    def get_prices(self):
-        """This method populates the prices attribute with a series with data as index and adjusted price as data,
-        currently the method is not implemented, just returning prices from 'Yahoo Finance'"""
-   
-        self.prices = pdr.get_data_yahoo(
-            self.ticker,
-            self.start_date,
-            self.end_date,
-        )["Adj Close"]
 
     def calculate_profit_and_loss(self):
         """This method calculates the accumulated returns of each period and multiply by the start money."""
@@ -141,6 +131,8 @@ class StockTrades:
             trades['Data Fim'] = self.trades[
                 (self.trades.shift(1) == trade_position) & (self.trades != trade_position)].index
             trades['Posição'] = trade_type
+            print(self.prices)
+            print(self.prices.index.isin(trades['Data Início']))
             trades['Preço Entrada'] = self.prices[self.prices.index.isin(trades['Data Início'])].values
             trades['Preço Saída'] = self.prices[self.prices.index.isin(trades['Data Fim'])].values
             trades['Retorno (%)'] = (trades['Preço Saída'] - trades['Preço Entrada']) \

@@ -1,6 +1,6 @@
 import pandas as pd
+import numpy as np
 from .support_functions import moving_average
-
 
 def calculate_trades_moving_average_cross(self):
     self.indicators = {

@@ -2,6 +2,7 @@ import random
 import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
+import datetime
 from plotly.subplots import make_subplots
 from typing import Dict, Callable
 
@@ -31,13 +32,17 @@ class StockTrades:
 
         self.prices = None
         self.trades = None
-        self.profit_and_loss = None
+        self.trade_profit_and_loss = None
         self.indicators = None
         self.price_graph = None
         self.profit_and_loss_graph = None
+        self.stock_profit_and_loss = None
         self.indicators_graph = None
+        self.main_summary_trades_table = None
         self.summary_trades_table = None
         self.fig_subplots = None
+        self.stock_max_dd = None
+        self.trade_max_dd = None
 
         self.get_prices(self)
         self.calculate_trades(self)
@@ -45,19 +50,52 @@ class StockTrades:
         self.create_price_graph()
         self.create_profit_loss_graph()
         self.create_indicators_graph()
+        self.calculate_summary_of_trades()
         self.create_table_of_trades()
         self.create_subplot_graph()
 
     def calculate_profit_and_loss(self):
         """This method calculates the accumulated returns of each period and multiply by the start money."""
 
-        stock_returns = (self.prices / self.prices.shift(1) - 1) * self.trades + 1
-        self.profit_and_loss = stock_returns.cumprod() * self.start_money
+        trade_returns = (self.prices / self.prices.shift(1) - 1) * self.trades + 1
+        self.trade_profit_and_loss = trade_returns.cumprod() * self.start_money
+
+        stock_returns = (self.prices / self.prices.shift(1) - 1) + 1
+        self.stock_profit_and_loss = stock_returns.cumprod() * self.start_money
+
 
     def calculate_summary_of_trades(self):
-        """This method is not implemented yet. It will create a table with summary information of the trade, such as
-        sharpe, drawdown and etc."""
-        pass
+            """This method is not implemented yet. It will create a table with summary information of the trade, such as
+            sharpe, drawdown and etc."""
+
+            self.stock_max_dd = (((self.stock_profit_and_loss - self.stock_profit_and_loss.cummax()) / self.stock_profit_and_loss.cummax()).min() * 100).round(1).astype(str) + '%'
+            self.trade_max_dd = (((self.trade_profit_and_loss - self.trade_profit_and_loss.cummax()) / self.trade_profit_and_loss.cummax()).min() * 100).round(1).astype(str) + '%'
+
+            start_date = datetime.datetime(2018, 1, 1)
+            end_date = datetime.datetime(2021, 1, 1)
+            years = (end_date - start_date).days / 365
+
+            resumo = {'': ['Montante Inicial',
+                         'Montante Final',
+                         'Retorno Total',
+                         'CAGR',
+                         'Máximo DrawDown',
+                         'Índice Sharpe'],
+                    'Ação': ['R$' + f'{self.start_money}',
+                             'R$' + self.stock_profit_and_loss.iat[-1].round(2).astype(str),
+                             ((self.stock_profit_and_loss.iat[-1] / self.start_money - 1) * 100).round(1).astype(str) + '%',
+                             ((((self.stock_profit_and_loss.iat[-1] / self.start_money) ** (1 / years)) - 1) * 100).round(1).astype(str) + '%',
+                             self.stock_max_dd,
+                             "-"], #INDICE SHARPE = (Ret Ação – SELIC)/ DESV Ação
+                    'Trade': ['R$' + f'{self.start_money}',
+                              'R$' + self.trade_profit_and_loss.iat[-1].round(2).astype(str),
+                              ((self.trade_profit_and_loss.iat[-1] / self.start_money - 1) * 100).round(1).astype(str) + '%',
+                              ((((self.trade_profit_and_loss.iat[-1] / self.start_money) ** (1 / years)) - 1) * 100).round(1).astype(str) + '%',
+                              self.trade_max_dd,
+                              "-"]} #INDICE SHARPE = (Ret Trade – SELIC)/ DESV Trade
+
+            self.main_summary_trades_table = pd.DataFrame(resumo)
+
 
     def create_price_graph(self):
         """This method create the price with the dots showing longs and short positions"""
@@ -96,8 +134,8 @@ class StockTrades:
     def create_profit_loss_graph(self):
         """This method create a graph showing the profit and loss of the model."""
         self.profit_and_loss_graph = go.Scatter(
-            y=self.profit_and_loss,
-            x=self.profit_and_loss.index,
+            y=self.trade_profit_and_loss,
+            x=self.trade_profit_and_loss.index,
             name='Profit & Loss',
             mode='lines'
         )

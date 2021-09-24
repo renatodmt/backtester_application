@@ -71,11 +71,19 @@ def update_dash_using_url(pathname):
     return [
         dcc.Graph(id='price-graph', figure=model.fig_subplots),
         html.Div(
-            children=dash_table.DataTable(
+            children=[dash_table.DataTable(
                 id='trade-summary',
-                data=model.summary_trades_table.to_dict('records'),
-                columns=[{"name": i, "id": i} for i in model.summary_trades_table.columns],
+                data=model.main_summary_trades_table.to_dict('records'),
+                columns=[{"name": i, "id": i} for i in model.main_summary_trades_table.columns],
                 style_cell={'textAlign': 'center'}
-            )
+            ),
+                dash_table.DataTable(
+                    id='trade-summary',
+                    data=model.summary_trades_table.to_dict('records'),
+                    columns=[{"name": i, "id": i} for i in model.summary_trades_table.columns],
+                    style_cell={'textAlign': 'center'}
+                )
+            ]
         )
     ]
+

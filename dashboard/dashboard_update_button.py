@@ -37,59 +37,74 @@ def update_dash_using_button(
     )
 
     return [
-        dcc.Graph(id='price-graph', figure=model.fig_subplots),
-        html.Div(
-            children=[dash_table.DataTable(
-                id='trade-summary',
-                data=model.main_summary_trades_table.to_dict('records'),
-                columns=[{"name": i, "id": i} for i in model.main_summary_trades_table.columns],
-                style_cell={'textAlign': 'center'},
-                style_data_conditional=[
-                    {
-                        'if': {
-                            'filter_query': '{Ação} > {Trade}',
-                            'column_id': 'Ação',
-                            'row_index': 3
-                        },
-                        'backgroundColor': 'green',
-                        'color': 'white'
-                    },
-                    {
-                        'if': {
-                            'filter_query': '{Ação} < {Trade}',
-                            'column_id': 'Trade',
-                            'row_index': 3
-                        },
-                        'backgroundColor': 'green',
-                        'color': 'white'
-                    },
-                    {
-                        'if': {
-                            'filter_query': '{Ação} < {Trade}',
-                            'column_id': 'Ação',
-                            'row_index': 4
-                        },
-                        'backgroundColor': 'green',
-                        'color': 'white'
-                    },
-                    {
-                        'if': {
-                            'filter_query': '{Ação} > {Trade}',
-                            'column_id': 'Trade',
-                            'row_index': 4
-                        },
-                        'backgroundColor': 'green',
-                        'color': 'white'
-                    }
-                ]
-
+        html.Div([  # big block
+            html.Div(
+                children=[dash_table.DataTable(
+                    id='trade-summary1',
+                    data=model.main_summary_trades_table.to_dict('records'),
+                    columns=[{"name": i, "id": i} for i in model.main_summary_trades_table.columns],
+                    style_cell={'textAlign': 'center'},
+                    style_data_conditional=style_cond
+                    )
+                ], style={'display': 'inline-block','width': '25%', 'vertical-align': 'top', 'margin-left': '3vw', 'margin-top': '3vw'}
             ),
-            dash_table.DataTable(
-                id='trade-summary',
-                data=model.summary_trades_table.to_dict('records'),
-                columns=[{"name": i, "id": i} for i in model.summary_trades_table.columns],
-                style_cell={'textAlign': 'center'}
+            html.Div(
+                children=[dcc.Graph(
+                    id='price-graph',
+                    figure=model.fig_subplots,
+                    style=dict(width=1000)
                 )
-            ]
-        )
+                ], style={'display': 'inline-block','width': '65%', 'vertical-align': 'top', 'margin-left': '3vw', 'margin-top': '3vw'}
+            ),
+            html.Div(
+                children=[dash_table.DataTable(
+                    id='trade-summary2',
+                    data=model.summary_trades_table.to_dict('records'),
+                    columns=[{"name": i, "id": i} for i in model.summary_trades_table.columns],
+                    style_cell={'textAlign': 'center'}
+                    )
+                ],style={'display': 'block','margin-top': '3vw', 'margin-left': '3vw','width': '87%'}
+            )
+        ]) # big block
     ]
+
+
+style_cond = [
+    {
+        'if': {
+            'filter_query': '{Ação} > {Trade}',
+            'column_id': 'Ação',
+            'row_index': 3
+        },
+        'backgroundColor': 'green',
+        'color': 'white'
+    },
+    {
+        'if': {
+            'filter_query': '{Ação} < {Trade}',
+            'column_id': 'Trade',
+            'row_index': 3
+        },
+        'backgroundColor': 'green',
+        'color': 'white'
+    },
+    {
+        'if': {
+            'filter_query': '{Ação} < {Trade}',
+            'column_id': 'Ação',
+            'row_index': 4
+        },
+        'backgroundColor': 'green',
+        'color': 'white'
+    },
+    {
+        'if': {
+            'filter_query': '{Ação} > {Trade}',
+            'column_id': 'Trade',
+            'row_index': 4
+        },
+        'backgroundColor': 'green',
+        'color': 'white'
+    }
+]
+

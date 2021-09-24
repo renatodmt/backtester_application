@@ -35,8 +35,6 @@ def get_corporative_events(ticker, start_date, end_date):
 
 
 def calculated_adjusted_prices(prices, dividends):
-    print(prices)
-    print(dividends)
     dataf = pd.DataFrame()
     dataf['prices'] = prices
     dataf['dividends'] = dividends

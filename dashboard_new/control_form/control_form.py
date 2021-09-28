@@ -6,6 +6,7 @@ import dashboard_new.control_form.callbacks
 control_form = html.Div(
     children=[
         permanent_controls.permanent_control,
-        strategy_related_controls.strategy_related_control
+        strategy_related_controls.strategy_related_control,
+        html.Button(children='Atualizar', id='update-button')
     ]
 )

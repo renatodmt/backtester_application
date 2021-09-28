@@ -10,16 +10,16 @@ ticker_input = dcc.Input(
 )
 
 data_range = dcc.DatePickerRange(
-    id='my-date-picker-range',
+    id='date-picker-range',
     min_date_allowed=datetime.date(2016, 1, 1),
     max_date_allowed=datetime.date(2021, 9, 20),
-    initial_visible_month=datetime.date(2020, 1, 1),
+    start_date=datetime.date(2020, 1, 1),
     end_date=datetime.date(2021, 1, 1)
 )
 
 investiment_input = dcc.Input(
     id='investment-input',
-    value='1000.00',
+    value=1000,
     type='number'
 )
 
@@ -29,27 +29,16 @@ strategy_picker = dcc.Dropdown(
     value='mov_avg'
 )
 
-permanent_control_labels = html.Div(
-    children=[
-        html.Label('Ticker:'),
-        html.Label('Data:'),
-        html.Label('Investimento Inicial:'),
-        html.Label('Estratégia:')
-    ]
-)
-
-permanent_control_controls = html.Div(
-    children=[
-        ticker_input,
-        data_range,
-        investiment_input,
-        strategy_picker
-    ]
-)
-
 permanent_control = html.Div(
     children=[
-        permanent_control_labels,
-        permanent_control_controls
-    ]
+        html.Label('Ticker:'),
+        ticker_input,
+        html.Label('Data:'),
+        data_range,
+        html.Label('Investimento Inicial:'),
+        investiment_input,
+        html.Label('Estratégia:'),
+        strategy_picker
+    ],
+    id='control-grid'
 )

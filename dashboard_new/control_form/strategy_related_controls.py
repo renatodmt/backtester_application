@@ -3,13 +3,12 @@ from dashboard_new.strategies import strategies_mapper
 
 
 def create_parameters_control(mapper, strategy):
-    labels_div_children = []
-    parameters_div_children = []
+    div_childs = []
     for parameter in mapper[strategy]['parameters']:
-        labels_div_children.append(
+        div_childs.append(
             html.Label(mapper[strategy]['parameters'][parameter]['label'])
         )
-        parameters_div_children.append(
+        div_childs.append(
             dcc.Input(
                 id=parameter,
                 type="number",
@@ -21,10 +20,8 @@ def create_parameters_control(mapper, strategy):
         )
     return html.Div(
         id=strategy.replace('_', '-') + '-parameters',
-        children=[
-            html.Div(children=labels_div_children),
-            html.Div(children=parameters_div_children)
-        ]
+        children=div_childs,
+        className='strategy-related-control-grid'
     )
 
 

@@ -1,9 +1,6 @@
-import random
 import pandas as pd
-import numpy as np
 import plotly.graph_objects as go
 import datetime
-from plotly.subplots import make_subplots
 from typing import Dict, Callable
 
 
@@ -15,8 +12,8 @@ class StockTrades:
     def __init__(
         self,
         ticker: str,
-        start_date: str,
-        end_date: str,
+        start_date: datetime.date,
+        end_date: datetime.date,
         model_parameters: Dict,
         calculate_trades: Callable,
         get_prices: Callable,
@@ -52,7 +49,6 @@ class StockTrades:
         self.create_indicators_graph()
         self.calculate_summary_of_trades()
         self.create_table_of_trades()
-        self.create_subplot_graph()
 
     def calculate_profit_and_loss(self):
         """This method calculates the accumulated returns of each period and multiply by the start money."""
@@ -62,7 +58,6 @@ class StockTrades:
 
         stock_returns = (self.prices / self.prices.shift(1) - 1) + 1
         self.stock_profit_and_loss = stock_returns.cumprod() * self.start_money
-
 
     def calculate_summary_of_trades(self):
             """This method is not implemented yet. It will create a table with summary information of the trade, such as
@@ -96,10 +91,9 @@ class StockTrades:
 
             self.main_summary_trades_table = pd.DataFrame(resumo)
 
-
     def create_price_graph(self):
         """This method create the price with the dots showing longs and short positions"""
-        self.price_graph = []
+        self.price_graph = go.Figure()
         line_dict = [
             {
                 'trade': [-1, 0, 1],
@@ -118,7 +112,7 @@ class StockTrades:
             }
         ]
         for line in line_dict:
-            self.price_graph.append(
+            self.price_graph.add_trace(
                 go.Scatter(
                     y=self.prices.where(
                         self.trades.isin(line['trade']),
@@ -133,18 +127,21 @@ class StockTrades:
 
     def create_profit_loss_graph(self):
         """This method create a graph showing the profit and loss of the model."""
-        self.profit_and_loss_graph = go.Scatter(
-            y=self.trade_profit_and_loss,
-            x=self.trade_profit_and_loss.index,
-            name='Profit & Loss',
-            mode='lines'
+        self.profit_and_loss_graph = go.Figure()
+        self.profit_and_loss_graph.add_trace(
+            go.Scatter(
+                y=self.trade_profit_and_loss,
+                x=self.trade_profit_and_loss.index,
+                name='Profit & Loss',
+                mode='lines'
+            )
         )
 
     def create_indicators_graph(self):
         """This method create the graph showing indicators value"""
-        self.indicators_graph = []
+        self.indicators_graph = go.Figure()
         for indicator in self.indicators:
-            self.indicators_graph.append(
+            self.indicators_graph.add_trace(
                 go.Scatter(
                     y=self.indicators[indicator],
                     x=self.indicators[indicator].index,
@@ -169,8 +166,6 @@ class StockTrades:
             trades['Data Fim'] = self.trades[
                 (self.trades.shift(1) == trade_position) & (self.trades != trade_position)].index
             trades['Posição'] = trade_type
-            print(self.prices)
-            print(self.prices.index.isin(trades['Data Início']))
             trades['Preço Entrada'] = self.prices[self.prices.index.isin(trades['Data Início'])].values
             trades['Preço Saída'] = self.prices[self.prices.index.isin(trades['Data Fim'])].values
             trades['Retorno (%)'] = (trades['Preço Saída'] - trades['Preço Entrada']) \
@@ -183,35 +178,3 @@ class StockTrades:
         self.summary_trades_table['Retorno (%)'] = self.summary_trades_table['Retorno (%)'].round(2).astype(str) + '%'
         self.summary_trades_table['Preço Entrada'] = self.summary_trades_table['Preço Entrada'].round(2)
         self.summary_trades_table['Preço Saída'] = self.summary_trades_table['Preço Saída'].round(2)
-
-    def create_subplot_graph(self):
-        """This graph is a subplot with prices graph, p&l and indicators """
-        self.fig_subplots = make_subplots(
-            rows=3,
-            cols=1,
-            shared_xaxes=True,
-            vertical_spacing=0.05
-        )
-
-        for trace in self.price_graph:
-            self.fig_subplots.add_trace(trace, row=1, col=1)
-
-        self.fig_subplots.add_trace(self.profit_and_loss_graph, row=2, col=1)
-
-        for trace in self.indicators_graph:
-            self.fig_subplots.add_trace(trace, row=3, col=1)
-
-        self.fig_subplots.update_layout(
-            margin=dict(
-                l=10,
-                r=10,
-                b=10,
-                t=10
-            )
-        )
-
-        self.fig_subplots['layout']['yaxis']['title'] = 'Preço'
-        self.fig_subplots['layout']['yaxis2']['title'] = 'Dinheiro'
-        self.fig_subplots['layout']['yaxis3']['title'] = 'Indicadores'
-        self.fig_subplots.update_layout(template=random.choice(templates))
-
